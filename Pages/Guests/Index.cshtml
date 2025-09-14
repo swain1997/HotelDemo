@@ -1,0 +1,105 @@
+﻿@page
+@model HotelDemo.Pages.Guests.IndexModel
+@{
+    ViewData["Title"] = "Guests";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">Guests — @Model.CurrentPropertyName</h2>
+    </div>
+
+    <!-- Search -->
+    <form method="get" class="row g-2 align-items-end mb-3">
+        <div class="col-12 col-md-6 col-lg-5">
+            <label class="form-label mb-1">Search (name / email / phone / document)</label>
+            <input name="q" value="@Model.q" class="form-control form-control-sm" placeholder="e.g. Maria or +30 69..." />
+        </div>
+        <div class="col-6 col-md-2">
+            <label class="form-label mb-1">Take</label>
+            <input name="take" value="@Model.take" class="form-control form-control-sm" />
+        </div>
+        <div class="col-6 col-md-2">
+            <button class="btn btn-outline-secondary btn-sm w-100">Filter</button>
+        </div>
+    </form>
+
+    <!-- Quick Add -->
+    <form method="post" asp-page-handler="Add" class="card mb-4">
+        <div class="card-header">Quick add guest</div>
+        <div class="card-body">
+            <div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
+            <div class="row g-2">
+                <div class="col-6 col-md-3">
+                    <label class="form-label">First name</label>
+                    <input asp-for="Add.FirstName" class="form-control form-control-sm" />
+                </div>
+                <div class="col-6 col-md-3">
+                    <label class="form-label">Last name</label>
+                    <input asp-for="Add.LastName" class="form-control form-control-sm" />
+                </div>
+                <div class="col-6 col-md-3">
+                    <label class="form-label">Email</label>
+                    <input asp-for="Add.Email" class="form-control form-control-sm" />
+                </div>
+                <div class="col-6 col-md-3">
+                    <label class="form-label">Phone</label>
+                    <input asp-for="Add.Phone" class="form-control form-control-sm" />
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label">Nationality</label>
+                    <input asp-for="Add.NationalityCode" class="form-control form-control-sm" placeholder="GR" maxlength="2" />
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label">Doc type</label>
+                    <input asp-for="Add.DocumentType" class="form-control form-control-sm" placeholder="ID / Passport" />
+                </div>
+                <div class="col-6 col-md-3">
+                    <label class="form-label">Doc number</label>
+                    <input asp-for="Add.DocumentNumber" class="form-control form-control-sm" />
+                </div>
+                <div class="col-12 col-md-2 ms-auto">
+                    <button class="btn btn-primary btn-sm w-100 mt-3 mt-md-0">Add guest</button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- Results -->
+    <div class="table-responsive">
+        <table class="table table-sm align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th style="min-width:220px">Guest</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Nat</th>
+                    <th>Doc</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Items.Count == 0)
+                {
+                    <tr><td colspan="5" class="text-center text-muted py-3">No guests found</td></tr>
+                }
+                else
+                {
+                    @foreach (var g in Model.Items)
+                    {
+                        <tr>
+                            <td>@g.FullName</td>
+                            <td>@g.Email</td>
+                            <td>@g.Phone</td>
+                            <td>@g.Nationality</td>
+                            <td>@g.Doc</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

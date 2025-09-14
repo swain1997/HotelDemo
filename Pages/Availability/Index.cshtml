@@ -1,0 +1,82 @@
+﻿@page
+@model HotelDemo.Pages.Availability.IndexModel
+@{
+    ViewData["Title"] = "Availability";
+    var s = Model.Data?.Start ?? DateOnly.FromDateTime(DateTime.Today);
+    var prev = s.AddDays(-14);
+    var next = s.AddDays(14);
+}
+
+<div class="container py-4">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h2 class="mb-0">Availability — @Model.CurrentPropertyName</h2>
+        <div class="btn-group">
+            <a class="btn btn-outline-secondary btn-sm"
+               asp-page="./Index"  asp-route-start="@prev.ToString("yyyy-MM-dd")">« Prev</a>
+            <a class="btn btn-outline-secondary btn-sm"
+               asp-page="./Index"  asp-route-start="@DateOnly.FromDateTime(DateTime.Today).ToString("yyyy-MM-dd")">Today</a>
+            <a class="btn btn-outline-secondary btn-sm"
+               asp-page="./Index"  asp-route-start="@next.ToString("yyyy-MM-dd")">Next »</a>
+        </div>
+    </div>
+
+    @if (Model.Data is null || Model.Data.RoomTypes.Count == 0)
+    {
+        <div class="alert alert-info">No room types for this property.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-sm align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th style="min-width:180px">Room Type</th>
+                        @foreach (var d in Model.Data.Dates)
+                        {
+                            <th class="text-center">
+                                <div>@d.ToString("dd MMM")</div>
+                                <small class="text-muted">@d.ToDateTime(TimeOnly.MinValue).ToString("ddd")</small>
+                            </th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var rt in Model.Data.RoomTypes)
+                    {
+                        <tr>
+                            <td>
+                                <strong>@rt.RoomTypeName</strong>
+                                <div class="text-muted small">@rt.RoomTypeCode</div>
+                            </td>
+                            @for (int i = 0; i < Model.Data.Days; i++)
+                            {
+                                var avail = rt.Available[i];
+                                var total = rt.TotalPerDay[i];
+                                var cls = avail == 0 ? "bg-danger text-white"
+                                : (avail <= Math.Max(1, total / 5) ? "bg-warning" : "bg-success text-white");
+                                <td class="text-center">
+                                    <span class="badge @cls">@avail/@total</span>
+                                </td>
+                            }
+                        </tr>
+                    }
+
+                    @{
+                        var (aTot, tTot) = Model.Data.Totals();
+                    }
+                    <tr class="table-light">
+                        <td><strong>Total</strong></td>
+                        @for (int i = 0; i < Model.Data.Days; i++)
+                        {
+                            var avail = aTot[i];
+                            var total = tTot[i];
+                            var cls = avail == 0 ? "bg-danger text-white"
+                            : (avail <= Math.Max(1, total / 5) ? "bg-warning" : "bg-success text-white");
+                            <td class="text-center"><span class="badge @cls">@avail/@total</span></td>
+                        }
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

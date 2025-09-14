@@ -1,0 +1,296 @@
+﻿@page "{id:int}"
+@model HotelDemo.Pages.Bookings.EditModel
+@{
+    ViewData["Title"] = "Edit Booking";
+    string active = string.IsNullOrEmpty(Model.t) ? "details" : Model.t!.ToLower();
+    string isActive(string x) => active == x ? "active" : "";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">Booking @Model.Booking.Code — @Model.Booking.PropertyName</h2>
+        <a class="btn btn-secondary btn-sm" asp-page="./Index">Back</a>
+    </div>
+
+    <ul class="nav nav-tabs">
+        <li class="nav-item"><a class="nav-link @isActive("details")" asp-route-id="@Model.Booking.Id" asp-route-t="details">Details</a></li>
+        <li class="nav-item"><a class="nav-link @isActive("rooms")" asp-route-id="@Model.Booking.Id" asp-route-t="rooms">Rooms</a></li>
+        <li class="nav-item"><a class="nav-link @isActive("guests")" asp-route-id="@Model.Booking.Id" asp-route-t="guests">Guests</a></li>
+        <li class="nav-item"><a class="nav-link @isActive("payments")" asp-route-id="@Model.Booking.Id" asp-route-t="payments">Payments</a></li>
+    </ul>
+
+    <div class="tab-content border border-top-0 rounded-bottom p-3">
+        @* ---------------- Details --------------- *@
+        @if (active == "details")
+        {
+            <form method="post" asp-page-handler="Details">
+                <input type="hidden" asp-for="id" />
+                <div class="row g-3">
+                    <div class="col-6 col-md-3">
+                        <label class="form-label">Status</label>
+                        <select asp-for="Details.Status"
+                                class="form-select"
+                                asp-items="Html.GetEnumSelectList<HotelDemo.Domain.Enums.BookingStatus>()">
+                        </select>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <label class="form-label">Check-in</label>
+                        <input asp-for="Details.CheckIn" class="form-control" type="date" />
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <label class="form-label">Check-out</label>
+                        <input asp-for="Details.CheckOut" class="form-control" type="date" />
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <label class="form-label">Nights</label>
+                        <input class="form-control" value="@Model.Booking.Nights" disabled />
+                    </div>
+
+                    <div class="col-4 col-md-2">
+                        <label class="form-label">Adults</label>
+                        <input asp-for="Details.Adults" class="form-control" />
+                    </div>
+                    <div class="col-4 col-md-2">
+                        <label class="form-label">Children</label>
+                        <input asp-for="Details.Children" class="form-control" />
+                    </div>
+                    <div class="col-4 col-md-2">
+                        <label class="form-label">Infants</label>
+                        <input asp-for="Details.Infants" class="form-control" />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">Email</label>
+                        <input asp-for="Details.ContactEmail" class="form-control" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Phone</label>
+                        <input asp-for="Details.ContactPhone" class="form-control" />
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Notes</label>
+                        <textarea asp-for="Details.Notes" class="form-control" rows="3"></textarea>
+                    </div>
+
+                    <div class="col-12 d-flex justify-content-between align-items-center">
+                        <div class="h5 mb-0">Total: € @Model.Booking.TotalAmount.ToString("0.00")</div>
+                        <button class="btn btn-primary">Save</button>
+                    </div>
+                </div>
+            </form>
+        }
+
+        @* ---------------- Rooms --------------- *@
+        @if (active == "rooms")
+        {
+            <form method="post" asp-page-handler="AddRoom" class="row g-2 align-items-end mb-3">
+                <input type="hidden" asp-for="id" />
+                <div class="col-md-5">
+                    <label class="form-label">Room Type</label>
+                    <select asp-for="AddRoom.RoomTypeId" class="form-select">
+                        @foreach (var rt in Model.RoomTypeOptions)
+                        {
+                            <option value="@rt.Id">@rt.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label">Assign Room (optional)</label>
+                    <select asp-for="AddRoom.RoomId" class="form-select">
+                        <option value="">(None)</option>
+                        @foreach (var kv in Model.RoomsByType)
+                        {
+                            <optgroup label="Type #@kv.Key">
+                                @foreach (var r in kv.Value)
+                                {
+                                    <option value="@r.Id">@r.Code</option>
+                                }
+                            </optgroup>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-primary w-100">Add</button>
+                </div>
+            </form>
+
+            <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Room Type</th>
+                            <th>Room</th>
+                            <th>Dates</th>
+                            <th>Nights</th>
+                            <th class="text-end">Line Total</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Booking.Rooms.Count == 0)
+                        {
+                            <tr><td colspan="6" class="text-center text-muted py-3">No rooms</td></tr>
+                        }
+                        else
+                        {
+                            @foreach (var l in Model.Booking.Rooms)
+                            {
+                                <tr>
+                                    <td>@l.RoomTypeName</td>
+                                    <td>
+                                        <form method="post" asp-page-handler="AssignRoom" class="d-flex gap-2">
+                                            <input type="hidden" asp-for="id" />
+                                            <input type="hidden" asp-for="AssignRoom.LineId" value="@l.Id" />
+                                            <select asp-for="AssignRoom.RoomId" class="form-select form-select-sm" style="min-width:120px">
+                                                <option value="">(None)</option>
+                                                @{
+                                                    var list = Model.RoomsByType.TryGetValue(l.RoomTypeId, out var arr) ? arr : new List<HotelDemo.Pages.Bookings.EditModel.RoomOpt>();
+                                                }
+                                                @foreach (var r in list)
+                                                {
+                                                    <option value="@r.Id" selected="@(l.RoomId == r.Id ? "selected" : null)">@r.Code</option>
+                                                }
+                                            </select>
+                                            <button class="btn btn-sm btn-outline-primary">Save</button>
+                                        </form>
+                                    </td>
+                                    <td>@l.CheckIn.ToString("dd MMM") – @l.CheckOut.ToString("dd MMM")</td>
+                                    <td>@l.Nights</td>
+                                    <td class="text-end">€ @l.LineTotal.ToString("0.00")</td>
+                                    <td class="text-end">
+                                        <form method="post" asp-page-handler="RemoveRoom">
+                                            <input type="hidden" asp-for="id" />
+                                            <input type="hidden" name="lineId" value="@l.Id" />
+                                            <button class="btn btn-sm btn-outline-danger">Remove</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                            <tr class="table-light">
+                                <td colspan="4"><strong>Total</strong></td>
+                                <td class="text-end"><strong>€ @Model.Booking.TotalAmount.ToString("0.00")</strong></td>
+                                <td></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        @* ---------------- Guests --------------- *@
+        @if (active == "guests")
+        {
+            <form method="post" asp-page-handler="AddGuest" class="row g-2 align-items-end mb-3">
+                <input type="hidden" asp-for="id" />
+                <div class="col-md-4">
+                    <label class="form-label">First Name</label>
+                    <input asp-for="AddGuest.FirstName" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Last Name</label>
+                    <input asp-for="AddGuest.LastName" class="form-control" />
+                </div>
+                <div class="col-md-2 form-check mt-4">
+                    <input asp-for="AddGuest.IsLead" class="form-check-input" />
+                    <label class="form-check-label">Lead guest</label>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-primary w-100">Add</button>
+                </div>
+            </form>
+
+            <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Guest</th>
+                            <th>Lead</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Booking.Guests.Count == 0)
+                        {
+                            <tr><td colspan="3" class="text-center text-muted py-3">No guests</td></tr>
+                        }
+                        else
+                        {
+                            @foreach (var g in Model.Booking.Guests)
+                            {
+                                <tr>
+                                    <td>@g.FullName</td>
+                                    <td>@(g.IsLead ? "Yes" : "No")</td>
+                                    <td class="text-end">
+                                        <form method="post" asp-page-handler="RemoveGuest">
+                                            <input type="hidden" asp-for="id" />
+                                            <input type="hidden" asp-for="RemoveGuest.BookingGuestId" value="@g.BookingGuestId" />
+                                            <button class="btn btn-sm btn-outline-danger">Remove</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        @* ---------------- Payments --------------- *@
+        @if (active == "payments")
+        {
+            <form method="post" asp-page-handler="AddPayment" class="row g-2 align-items-end mb-3">
+                <input type="hidden" asp-for="id" />
+                <div class="col-md-4">
+                    <label class="form-label">Method</label>
+                    <select asp-for="Pay.Method" class="form-select">
+                        <option>Cash</option>
+                        <option>CardPOS</option>
+                        <option>CardOnline</option>
+                        <option>BankTransfer</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Amount</label>
+                    <input asp-for="Pay.Amount" class="form-control" />
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-primary w-100">Add</button>
+                </div>
+            </form>
+
+            <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Method</th>
+                            <th class="text-end">Amount</th>
+                            <th>Received</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Booking.Payments.Count == 0)
+                        {
+                            <tr><td colspan="3" class="text-center text-muted py-3">No payments</td></tr>
+                        }
+                        else
+                        {
+                            @foreach (var p in Model.Booking.Payments)
+                            {
+                                <tr>
+                                    <td>@p.Method</td>
+                                    <td class="text-end">€ @p.Amount.ToString("0.00")</td>
+                                    <td>@p.ReceivedAt.LocalDateTime.ToString("g")</td>
+                                </tr>
+                            }
+                            <tr class="table-light">
+                                <td class="text-end"><strong>Total</strong></td>
+                                <td class="text-end"><strong>€ @Model.Booking.Payments.Sum(x => x.Amount).ToString("0.00")</strong></td>
+                                <td></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

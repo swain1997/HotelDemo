@@ -1,0 +1,17 @@
+﻿/* μικρές πινελιές */
+.navbar-brand {
+    font-weight: 700;
+    letter-spacing: .3px;
+}
+
+.card {
+    border-radius: 1rem;
+}
+
+.btn {
+    border-radius: .75rem;
+}
+
+.table thead th {
+    white-space: nowrap;
+}

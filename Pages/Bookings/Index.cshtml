@@ -1,0 +1,108 @@
+﻿@page
+@model HotelDemo.Pages.Bookings.IndexModel
+@{
+    ViewData["Title"] = "Bookings";
+}
+
+<div class="container py-4">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h2 class="mb-0">Bookings — @Model.CurrentPropertyName</h2>
+
+        <!-- NEW BOOKING -->
+        <form method="post" asp-page-handler="New" class="d-flex align-items-end gap-2">
+            <div>
+                <label class="form-label mb-1">Check-in</label>
+                <input asp-for="New.CheckIn" class="form-control form-control-sm" type="date" />
+            </div>
+            <div>
+                <label class="form-label mb-1">Check-out</label>
+                <input asp-for="New.CheckOut" class="form-control form-control-sm" type="date" />
+            </div>
+            <div>
+                <label class="form-label mb-1">Adults</label>
+                <input asp-for="New.Adults" class="form-control form-control-sm" style="width:90px" />
+            </div>
+            <div>
+                <label class="form-label mb-1">Children</label>
+                <input asp-for="New.Children" class="form-control form-control-sm" style="width:90px" />
+            </div>
+            <div>
+                <label class="form-label mb-1">Infants</label>
+                <input asp-for="New.Infants" class="form-control form-control-sm" style="width:90px" />
+            </div>
+            <input type="hidden" name="pid" value="@Model.CurrentPropertyId" />
+            <button class="btn btn-primary btn-sm">New Booking</button>
+        </form>
+    </div>
+
+    <!-- FILTERS (GET) -->
+    <form method="get" class="row g-2 align-items-end mb-3">
+        <input type="hidden" name="pid" value="@Model.CurrentPropertyId" />
+        <div class="col-6 col-md-3">
+            <label class="form-label mb-1">Code</label>
+            <input name="q" value="@Model.q" class="form-control form-control-sm" />
+        </div>
+        <div class="col-6 col-md-3">
+            <label class="form-label mb-1">Status</label>
+            <select name="status" class="form-select form-select-sm">
+                <option value="">(All)</option>
+                @foreach (var s in Enum.GetValues<HotelDemo.Domain.Enums.BookingStatus>())
+                {
+                    <option value="@s" selected="@(Model.status == s ? "selected" : null)">@s</option>
+                }
+            </select>
+        </div>
+        <div class="col-6 col-md-3">
+            <label class="form-label mb-1">From (Check-in)</label>
+            <input name="from" value="@(Model.from?.ToString("yyyy-MM-dd"))" type="date" class="form-control form-control-sm" />
+        </div>
+        <div class="col-6 col-md-3">
+            <label class="form-label mb-1">To (Check-out)</label>
+            <input name="to" value="@(Model.to?.ToString("yyyy-MM-dd"))" type="date" class="form-control form-control-sm" />
+        </div>
+        <div class="col-12">
+            <button class="btn btn-outline-secondary btn-sm">Filter</button>
+        </div>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table table-sm align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Code</th>
+                    <th>Status</th>
+                    <th>Check-in</th>
+                    <th>Check-out</th>
+                    <th>Nights</th>
+                    <th>Lead Guest</th>
+                    <th class="text-end">Total</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Items.Count == 0)
+                {
+                    <tr><td colspan="8" class="text-center text-muted py-3">No bookings</td></tr>
+                }
+                else
+                {
+                    @foreach (var b in Model.Items)
+                    {
+                        <tr>
+                            <td>@b.Code</td>
+                            <td>@b.Status</td>
+                            <td>@b.CheckIn.ToString("dd MMM")</td>
+                            <td>@b.CheckOut.ToString("dd MMM")</td>
+                            <td>@b.Nights</td>
+                            <td>@b.LeadGuest</td>
+                            <td class="text-end">€ @b.TotalAmount.ToString("0.00")</td>
+                            <td class="text-end">
+                                <a class="btn btn-sm btn-primary" asp-page="./Edit" asp-route-id="@b.Id">Open</a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

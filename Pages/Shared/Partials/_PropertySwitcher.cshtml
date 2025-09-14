@@ -1,0 +1,30 @@
+﻿@* Shared property switcher usable από παντού *@
+@using Microsoft.EntityFrameworkCore
+@inject HotelDemo.Infrastructure.Data.AppDbContext Db
+
+@{
+    var props = await Db.Properties.OrderBy(p => p.Name).ToListAsync();
+
+    int? currentPid = null;
+    if (Context.Request.Cookies.TryGetValue("pid", out var pidStr) && int.TryParse(pidStr, out var pidVal))
+        currentPid = pidVal;
+
+    // Θα γυρίσουμε πίσω εδώ μετά το set
+    var returnUrl = (string)(Context.Request.Path + Context.Request.QueryString);
+}
+
+@if (props.Count > 0)
+{
+    <form method="get" asp-page="/SetPid" class="d-flex align-items-center me-3">
+        <input type="hidden" name="returnUrl" value="@returnUrl" />
+        <select name="pid" class="form-select form-select-sm me-2" onchange="this.form.submit()">
+            @foreach (var p in props)
+            {
+                <option value="@p.Id" selected="@(currentPid == p.Id ? "selected" : null)">
+                    @p.Name (@p.Code)
+                </option>
+            }
+        </select>
+        <noscript><button class="btn btn-sm btn-light">Go</button></noscript>
+    </form>
+}

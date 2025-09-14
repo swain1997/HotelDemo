@@ -1,0 +1,64 @@
+﻿@page
+@model HotelDemo.Pages.IndexModel
+@{
+    ViewData["Title"] = "Welcome";
+}
+
+<section class="py-5 text-center">
+    <h1 class="display-4 mb-2">Welcome to HotelDemo</h1>
+    <p class="lead text-muted mb-4">Manage properties, bookings & availability in one place.</p>
+
+    <img src="~/images/hero.jpg" asp-append-version="true"
+         class="img-fluid rounded shadow"
+         alt="Hotel hero"
+         style="max-height: 360px; object-fit: cover;" />
+</section>
+
+<section class="container pb-5">
+    <div class="row g-4">
+        <!-- Bookings -->
+        <div class="col-md-4">
+            <a asp-page="/Bookings/Index"
+               class="card h-100 shadow-sm text-reset text-decoration-none">
+                <img src="~/images/bookings.jpg" asp-append-version="true"
+                     class="card-img-top"
+                     alt="Bookings"
+                     style="height: 180px; object-fit: cover;" />
+                <div class="card-body">
+                    <h5 class="card-title mb-1">Fast Bookings</h5>
+                    <p class="card-text text-muted mb-0">Create & manage reservations quickly.</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Availability -->
+        <div class="col-md-4">
+            <a asp-page="/Availability/Index"
+               class="card h-100 shadow-sm text-reset text-decoration-none">
+                <img src="~/images/availability.jpg" asp-append-version="true"
+                     class="card-img-top"
+                     alt="Availability"
+                     style="height: 180px; object-fit: cover;" />
+                <div class="card-body">
+                    <h5 class="card-title mb-1">Availability</h5>
+                    <p class="card-text text-muted mb-0">Calendars and inventory at a glance.</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Guests -->
+        <div class="col-md-4">
+            <a asp-page="/Guests/Index"
+               class="card h-100 shadow-sm text-reset text-decoration-none">
+                <img src="~/images/guests.jpg" asp-append-version="true"
+                     class="card-img-top"
+                     alt="Guests"
+                     style="height: 180px; object-fit: cover;" />
+                <div class="card-body">
+                    <h5 class="card-title mb-1">Guests</h5>
+                    <p class="card-text text-muted mb-0">Keep guest details organized.</p>
+                </div>
+            </a>
+        </div>
+    </div>
+</section>

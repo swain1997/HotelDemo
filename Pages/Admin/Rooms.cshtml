@@ -1,0 +1,124 @@
+﻿@page
+@model HotelDemo.Pages.Admin.RoomsModel
+@{
+    ViewData["Title"] = "Admin — Rooms";
+}
+
+<div class="container py-4">
+    <h2 class="mb-3">Admin — Rooms (@Model.CurrentPropertyName)</h2>
+
+    @if (TempData["ok"] is string ok)
+    {
+        <div class="alert alert-success">@ok</div>
+    }
+    @if (TempData["err"] is string err)
+    {
+        <div class="alert alert-danger">@err</div>
+    }
+
+    <div class="row g-4">
+        <!-- Create -->
+        <div class="col-lg-5">
+            <div class="card">
+                <div class="card-header">Create room</div>
+                <div class="card-body">
+                    <form method="post" asp-page-handler="Add">
+                        <div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
+
+                        <div class="mb-2">
+                            <label class="form-label">Room type</label>
+                            <select asp-for="Add.RoomTypeId" class="form-select form-select-sm">
+                                @foreach (var rt in Model.RoomTypeOptions)
+                                {
+                                    <option value="@rt.Id">@rt.Name</option>
+                                }
+                            </select>
+                            <span asp-validation-for="Add.RoomTypeId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <label class="form-label">Code</label>
+                                <input asp-for="Add.Code" class="form-control form-control-sm" placeholder="e.g. 101 / A1" />
+                                <span asp-validation-for="Add.Code" class="text-danger small"></span>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Base price / night</label>
+                                <input asp-for="Add.BasePricePerNight" class="form-control form-control-sm" />
+                                <span asp-validation-for="Add.BasePricePerNight" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-2">
+                            <label class="form-label">Notes (optional)</label>
+                            <textarea asp-for="Add.Notes" class="form-control form-control-sm" rows="2"></textarea>
+                        </div>
+
+                        <div class="form-check mb-2">
+                            <input asp-for="Add.IsActive" class="form-check-input" />
+                            <label class="form-check-label">Active</label>
+                        </div>
+
+                        <div class="mt-2">
+                            <button class="btn btn-primary btn-sm">Create</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- List -->
+        <div class="col-lg-7">
+            <div class="card">
+                <div class="card-header">Rooms (@Model.CurrentPropertyName)</div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Type</th>
+                                    <th class="text-end">Base price</th>
+                                    <th>Active</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.Items.Count == 0)
+                                {
+                                    <tr><td colspan="5" class="text-center text-muted py-3">No rooms</td></tr>
+                                }
+                                else
+                                {
+                                    @foreach (var r in Model.Items)
+                                    {
+                                        <tr>
+                                            <td>@r.Code</td>
+                                            <td>@r.RoomTypeName</td>
+                                            <td class="text-end">€ @r.Price.ToString("0.00")</td>
+                                            <td>@(r.IsActive ? "Yes" : "No")</td>
+                                            <td class="text-end">
+                                                <form method="post" asp-page-handler="Delete" class="d-inline" onsubmit="return confirm('Delete room @r.Code?');">
+                                                    <input type="hidden" name="id" value="@r.Id" />
+                                                    <button class="btn btn-sm btn-outline-danger">Delete</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-info mt-2 mb-0">
+                <small>Η διαγραφή αποτυγχάνει αν το δωμάτιο έχει χρησιμοποιηθεί σε κρατήσεις.</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,17 @@
+﻿@model string
+
+@{
+    var s = Model ?? "";
+    var css = s switch
+    {
+        "Tentative" => "bg-secondary",
+        "Confirmed" => "bg-primary",
+        "CheckedIn" => "bg-success",
+        "CheckedOut" => "bg-info",
+        "Cancelled" => "bg-danger",
+        "NoShow" => "bg-warning text-dark",
+        _ => "bg-light text-dark"
+    };
+}
+
+<span class="badge @css">@s</span>

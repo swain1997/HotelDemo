@@ -1,0 +1,128 @@
+﻿@page
+@model HotelDemo.Pages.Dashboard.IndexModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="container py-4">
+
+    <h2 class="mb-3">Dashboard — @Model.CurrentPropertyName</h2>
+
+    <!-- KPIs -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="card text-center">
+                <div class="card-body">
+                    <div class="h6 text-muted">Rooms</div>
+                    <div class="display-6">@Model.RoomsActive/@Model.RoomsTotal</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="card text-center">
+                <div class="card-body">
+                    <div class="h6 text-muted">Arrivals</div>
+                    <div class="display-6">@Model.ArrivalsToday</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="card text-center">
+                <div class="card-body">
+                    <div class="h6 text-muted">Departures</div>
+                    <div class="display-6">@Model.DeparturesToday</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+            <div class="card text-center">
+                <div class="card-body">
+                    <div class="h6 text-muted">In-House</div>
+                    <div class="display-6">@Model.InHouse</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-8 col-xl-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <div class="h6 text-muted">Payments (This Month)</div>
+                    <div class="display-6">€ @Model.PaymentsThisMonth.ToString("0.00")</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">Today's Arrivals</div>
+                <div class="card-body p-0">
+                    <table class="table table-sm mb-0">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Lead Guest</th>
+                                <th>Nights</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.TodayArrivals.Count == 0)
+                            {
+                                <tr><td colspan="4" class="text-center text-muted py-3">No arrivals today</td></tr>
+                            }
+                            else
+                            {
+                                @foreach (var b in Model.TodayArrivals)
+                                {
+                                    <tr>
+                                        <td>@b.Code</td>
+                                        <td>@b.LeadGuest</td>
+                                        <td>@b.Nights</td>
+                                        <td>@b.Status</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">Today's Departures</div>
+                <div class="card-body p-0">
+                    <table class="table table-sm mb-0">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Lead Guest</th>
+                                <th>Nights</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.TodayDepartures.Count == 0)
+                            {
+                                <tr><td colspan="4" class="text-center text-muted py-3">No departures today</td></tr>
+                            }
+                            else
+                            {
+                                @foreach (var b in Model.TodayDepartures)
+                                {
+                                    <tr>
+                                        <td>@b.Code</td>
+                                        <td>@b.LeadGuest</td>
+                                        <td>@b.Nights</td>
+                                        <td>@b.Status</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
